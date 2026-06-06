@@ -25,14 +25,25 @@ async function uploadFile(options) {
   const filePath = options.filePath;
 
   if (!use_private_tencent_cos) {
-    console.log('使用EMAS内置云存储上传文件, 路径:', fileName);
-    const result = await app.mpServerless.file.uploadFile({
-      filePath: filePath, // 小程序临时文件路径
-      cloudPath: fileName, // 上传至云端的路径
-    });
-    console.log('=== EMAS上传完整结果 ===');
-    console.log(JSON.stringify(result, null, 2));
-    console.log('=== EMAS上传结果结束 ===');
+    console.log('=== EMAS上传开始 ===');
+    console.log('上传文件路径:', filePath);
+    console.log('云端存储路径:', fileName);
+    
+    let result;
+    try {
+      result = await app.mpServerless.file.uploadFile({
+        filePath: filePath, // 小程序临时文件路径
+        cloudPath: fileName, // 上传至云端的路径
+      });
+      console.log('=== EMAS上传完整结果 ===');
+      console.log(JSON.stringify(result, null, 2));
+      console.log('=== EMAS上传结果结束 ===');
+    } catch (uploadError) {
+      console.error('=== EMAS上传失败 ===');
+      console.error('错误信息:', uploadError);
+      console.error('错误详情:', JSON.stringify(uploadError, null, 2));
+      throw uploadError;
+    }
     
     // 兼容多种可能的返回值格式
     let fileId = result.fileId || result.fileID || '';
@@ -48,6 +59,7 @@ async function uploadFile(options) {
     
     console.log('提取到的 fileId:', fileId);
     console.log('提取到的 fileUrl:', fileUrl);
+    console.log('=== EMAS上传结束 ===');
     
     return {
       fileId: fileId,
