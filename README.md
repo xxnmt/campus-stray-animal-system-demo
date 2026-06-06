@@ -1,4 +1,31 @@
 campus-stray-animal-system
+v0.0.6 (体验版)：
+## 修改报告
+### 完善前端上传逻辑
+文件 ： miniprogram/components/modifyUserInfo/modifyUserInfo.js 内容 ：
+- 修复昵称输入事件兼容性
+- 添加头像上传路径格式处理
+- 新增临时路径回显和防缓存时间戳
+### 优化用户信息获取
+文件 ： miniprogram/utils/user.js 内容 ：
+- 在 getUser 、 getUserInfo 、 getUserInfoMulti 方法中添加头像 URL 清理逻辑
+- 使用 trim().replace(/[ "]/g, '')` 清理多余字符
+### 添加图片压缩
+文件 ： miniprogram/components/modifyUserInfo/modifyUserInfo.js 内容 ：
+- 添加文件大小检查（超过 1MB 自动压缩）
+- 使用 wx.compressImage 进行图片压缩，质量设为 80
+- 压缩后重新获取文件信息并上传
+### 修复头像显示缓存问题
+文件 ：
+- miniprogram/components/modifyUserInfo/modifyUserInfo.js
+- miniprogram/pages/info/userInfo/userInfo.js 内容 ：
+- 在头像 URL 后添加时间戳 ?t=${Date.now()} 防止缓存
+- 临时路径回显时直接使用临时文件路径
+### 修复 app.json 配置
+文件 ： miniprogram/app.json 内容 ：
+- 移除错误的 requiredPrivateInfos 字段（该字段不支持 chooseAvatar ）
+- 保留正确的权限声明
+
 v0.0.5（体验版）：
 问题 ：昵称可以修改，但头像无法上传
 修改文件 ：
