@@ -28,15 +28,20 @@ Component({
 
   methods: {
     onChooseAvatar(e) {
-      const { avatarUrl } = e.detail
-      this.setData({
-        "user.userInfo.avatarUrl": avatarUrl,
-      });
+      // 兼容不同的返回格式
+      let avatarUrl = e.detail && e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : e.detail;
+      console.log('onChooseAvatar', e, avatarUrl);
+      if (avatarUrl) {
+        this.setData({
+          "user.userInfo.avatarUrl": avatarUrl,
+        });
+      }
     },
 
     onChangeNickName(e) {
-      const { value } = e.detail;
-      console.log(e);
+      // 兼容 type="nickname" 的情况，可能通过 e.detail.value 或 e.detail 获取值
+      let value = e.detail && e.detail.value !== undefined ? e.detail.value : e.detail;
+      console.log('onChangeNickName', e, value);
       this.setData({
         "user.userInfo.nickName": value,
       });
@@ -67,6 +72,7 @@ Component({
           title: '获取openid失败',
           icon: "error"
         });
+        wx.hideLoading();
         return false;
       }
 
@@ -74,51 +80,60 @@ Component({
         wx.hideLoading();
         return false;
       }
-      if (!user.userInfo.avatarUrl) {
-        wx.showToast({
-          title: '请选择头像',
-          icon: 'error',
-        });
-        wx.hideLoading();
-        return false;
+
+      // 允许只更新昵称，不强制要求有头像（但如果有头像会更新）
+      if (user.userInfo.avatarUrl) {
+        var fileInfo = await this.uploadAvatar(user.userInfo.avatarUrl);
+        user.userInfo.avatarUrl = fileInfo.fileUrl;
+        user.userInfo.avatarUrlId = fileInfo.fileId;
       }
 
-      var fileInfo = await this.uploadAvatar(user.userInfo.avatarUrl);
-      user.userInfo.avatarUrl = fileInfo.fileUrl;
-      user.userInfo.avatarUrlId = fileInfo.fileId;
+      console.log('准备更新的用户信息:', user);
 
-      console.log(user);
+      try {
+        // 更新数据库的userInfo
+        const updateResult = await api.userOp({
+          op: 'update',
+          user: user
+        });
+        console.log('更新结果:', updateResult);
 
-      // 更新数据库的userInfo
-      await api.userOp({
-        op: 'update',
-        user: user
-      });
+        wx.hideLoading();
 
-      wx.hideLoading();
+        // 发布更新事件
+        removeCacheItem("current-user");
+        app.globalData.eventBus.$emit('userInfoUpdated');
 
-      // 发布更新事件
-      removeCacheItem("current-user");
-      app.globalData.eventBus.$emit('userInfoUpdated');
+        this.hide();
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        });
 
-      this.hide();
-      wx.showToast({
-        title: '保存成功',
-        icon: 'success'
-      });
-
-      this.triggerEvent('userInfoUpdated', { user: user });
+        this.triggerEvent('userInfoUpdated', { user: user });
+      } catch (error) {
+        console.error('更新用户信息失败:', error);
+        wx.hideLoading();
+        wx.showToast({
+          title: '保存失败，请重试',
+          icon: 'error'
+        });
+      }
     },
 
     async uploadAvatar(tempFilePath) {
       const openid = this.data.user.openid;
-      if (!tempFilePath.includes("://tmp")) {
-        return { fileId: this.data.user.userInfo.avatarUrlId, fileUrl: tempFilePath };
+      if (!tempFilePath || !tempFilePath.includes("://tmp")) {
+        // 如果不是临时文件路径，直接返回现有信息
+        return { 
+          fileId: this.data.user.userInfo.avatarUrlId || '', 
+          fileUrl: tempFilePath || this.data.user.userInfo.avatarUrl 
+        };
       }
 
-      //获取后缀
+      //获取后缀，如果没有后缀则默认为jpg
       const index = tempFilePath.lastIndexOf(".");
-      const ext = tempFilePath.substr(index + 1);
+      const ext = index > 0 ? tempFilePath.substr(index + 1) : 'jpg';
       // 上传图片
       let upRes = await uploadFile({
         filePath: tempFilePath, // 小程序临时文件路径
@@ -127,7 +142,11 @@ Component({
 
       console.log('upRes', upRes);
 
-      return { fileId: upRes.fileId, fileUrl: upRes.fileUrl };
+      // 兼容不同的返回格式
+      let fileId = upRes.fileId || upRes.fileID || '';
+      let fileUrl = upRes.fileUrl || upRes.url || tempFilePath;
+      
+      return { fileId: fileId, fileUrl: fileUrl };
     },
 
     async checkNickName(name) {

@@ -11,9 +11,9 @@
       <image class="avatar" src="{{user.userInfo.avatarUrl || defaultAvatarUrl}}" mode="aspectFill"></image>
     </button>
     <view class="label-small">昵称</view>
-    <view class="label-tip">tip: 若使用微信昵称后保存无效，请尝试增删一个字符再保存（wx的bug）</view>
+    <view class="label-tip">请输入昵称</view>
     <view class="name-container">
-      <input type="nickname" class="user-name" placeholder="请输入昵称" value="{{user.userInfo.nickName}}" bindinput="onChangeNickName"/>
+      <input class="user-name" placeholder="请输入昵称" value="{{user.userInfo.nickName}}" bindinput="onChangeNickName"/>
   
       <button class="primary" bindtap="clickUpload">保存</button>
     </view>

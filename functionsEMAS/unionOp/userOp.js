@@ -35,11 +35,11 @@ module.exports = async (ctx) => {
       } = await ctx.mpserverless.db.collection('user').findOne({
         openid: openid
       });
-      if (targetUser.openid != openid) {
-        return "Err, can only update your own info.";
+      if (!targetUser) {
+        return "Err, user not found.";
       }
       var user = ctx.args.user;
-      const _id = user._id;
+      const _id = targetUser._id;
       delete user._id; // 因为数据库不能更新_id
       delete user.openid; // 这个键唯一
       delete user.manager; // 不能用这个函数更新
