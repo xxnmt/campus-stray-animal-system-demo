@@ -38,12 +38,20 @@ async function uploadFile(options) {
     let fileId = result.fileId || result.fileID || '';
     let fileUrl = result.fileUrl || result.url || '';
     
+    // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+    if (fileUrl) {
+      fileUrl = fileUrl.trim().replace(/[`"]/g, '');
+    }
+    if (fileId) {
+      fileId = fileId.trim().replace(/[`"]/g, '');
+    }
+    
     console.log('提取到的 fileId:', fileId);
     console.log('提取到的 fileUrl:', fileUrl);
     
     return {
       fileId: fileId,
-      fileUrl: fileUrl
+      fileUrl: fileUrl,
     };
   }
 

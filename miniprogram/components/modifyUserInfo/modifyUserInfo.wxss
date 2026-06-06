@@ -46,28 +46,6 @@
   box-shadow: 0rpx 10rpx 20rpx var(--color-ltblack-transparent);
 }
 
-.avatar-selector {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 20rpx;
-  margin-bottom: 30rpx;
-}
-
-.avatar-btn {
-  padding: 15rpx 30rpx;
-  font-size: 26rpx;
-  border-radius: 50rpx;
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
-  border: 2rpx solid var(--color-primary);
-  line-height: 1.5;
-}
-
-.avatar-btn::after {
-  border: none;
-}
-
 .user-name {
   width: 500rpx;
   overflow: hidden;

@@ -2,7 +2,7 @@
 <popup show="{{show}}" bind:close="hide">
   <view class="editInfo">
     <view class="label-small">头像</view>
-    <view class="label-tip">tip: 选择头像来源<text wx:if="{{!user.userInfo.avatarUrl}}">（当前是默认头像）</text></view>
+    <view class="label-tip">tip: 点击头像进行更换<text wx:if="{{!user.userInfo.avatarUrl}}">（当前是默认头像）</text></view>
     
     <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
       <view class="overlay">
@@ -10,11 +10,6 @@
       </view>
       <image class="avatar" src="{{user.userInfo.avatarUrl || defaultAvatarUrl}}" mode="aspectFill"></image>
     </button>
-    
-    <view class="avatar-selector">
-      <button class="avatar-btn" bindtap="onChooseAvatar">使用微信头像</button>
-      <button class="avatar-btn" bindtap="chooseFromAlbum">从相册选择</button>
-    </view>
     <view class="label-small">昵称</view>
     <view class="label-tip">请输入昵称</view>
     <view class="name-container">

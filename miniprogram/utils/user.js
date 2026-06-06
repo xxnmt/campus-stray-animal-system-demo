@@ -40,6 +40,10 @@ async function getUser(options) {
     openid: openid
   }));
   if (userRes && userRes.userInfo) {
+    // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+    if (userRes.userInfo.avatarUrl) {
+      userRes.userInfo.avatarUrl = userRes.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+    }
     userRes.userInfo.avatarUrl = await signCosUrl(userRes.userInfo.avatarUrl);
   }
 

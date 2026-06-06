@@ -30,33 +30,11 @@ Component({
     onChooseAvatar(e) {
       // 兼容不同的返回格式
       let avatarUrl = e.detail && e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : e.detail;
-      console.log('onChooseAvatar（微信头像）', e, avatarUrl);
+      console.log('onChooseAvatar', e, avatarUrl);
       if (avatarUrl) {
         this.setData({
           "user.userInfo.avatarUrl": avatarUrl,
         });
-      }
-    },
-    
-    async chooseFromAlbum() {
-      console.log('chooseFromAlbum 从相册选择');
-      try {
-        const res = await wx.chooseMedia({
-          count: 1,
-          mediaType: ['image'],
-          sourceType: ['album'],
-          maxDuration: 30,
-        });
-        console.log('相册选择结果:', res);
-        if (res.tempFiles && res.tempFiles.length > 0) {
-          const tempFilePath = res.tempFiles[0].tempFilePath;
-          console.log('从相册选择的临时图片路径:', tempFilePath);
-          this.setData({
-            "user.userInfo.avatarUrl": tempFilePath,
-          });
-        }
-      } catch (error) {
-        console.error('从相册选择图片失败:', error);
       }
     },
 
@@ -167,6 +145,14 @@ Component({
       // 兼容不同的返回格式
       let fileId = upRes.fileId || upRes.fileID || '';
       let fileUrl = upRes.fileUrl || upRes.url || tempFilePath;
+      
+      // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+      if (fileUrl) {
+        fileUrl = fileUrl.trim().replace(/[`"]/g, '');
+      }
+      if (fileId) {
+        fileId = fileId.trim().replace(/[`"]/g, '');
+      }
       
       return { fileId: fileId, fileUrl: fileUrl };
     },

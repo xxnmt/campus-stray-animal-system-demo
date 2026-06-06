@@ -155,6 +155,11 @@ Page({
     
     const badgeInfo = roleMapping[roleKey];
     
+    // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+    if (user.userInfo && user.userInfo.avatarUrl) {
+      user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+    }
+    
     console.log('准备设置到页面的用户数据:', user);
     console.log('头像URL:', user.userInfo.avatarUrl);
     console.log('头像ID:', user.userInfo.avatarUrlId);
