@@ -30,11 +30,33 @@ Component({
     onChooseAvatar(e) {
       // 兼容不同的返回格式
       let avatarUrl = e.detail && e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : e.detail;
-      console.log('onChooseAvatar', e, avatarUrl);
+      console.log('onChooseAvatar（微信头像）', e, avatarUrl);
       if (avatarUrl) {
         this.setData({
           "user.userInfo.avatarUrl": avatarUrl,
         });
+      }
+    },
+    
+    async chooseFromAlbum() {
+      console.log('chooseFromAlbum 从相册选择');
+      try {
+        const res = await wx.chooseMedia({
+          count: 1,
+          mediaType: ['image'],
+          sourceType: ['album'],
+          maxDuration: 30,
+        });
+        console.log('相册选择结果:', res);
+        if (res.tempFiles && res.tempFiles.length > 0) {
+          const tempFilePath = res.tempFiles[0].tempFilePath;
+          console.log('从相册选择的临时图片路径:', tempFilePath);
+          this.setData({
+            "user.userInfo.avatarUrl": tempFilePath,
+          });
+        }
+      } catch (error) {
+        console.error('从相册选择图片失败:', error);
       }
     },
 

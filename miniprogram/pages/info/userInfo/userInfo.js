@@ -128,9 +128,11 @@ Page({
   },
 
   async loadUser() {
+    console.log('=== loadUser 开始加载用户信息 ===');
     var user = await getUser({
       nocache: true,
     });
+    console.log('从后端获取到的用户数据:', JSON.stringify(user, null, 2));
     user = deepcopy(user);
 
     if (!user.userInfo) {
@@ -153,10 +155,16 @@ Page({
     
     const badgeInfo = roleMapping[roleKey];
     
+    console.log('准备设置到页面的用户数据:', user);
+    console.log('头像URL:', user.userInfo.avatarUrl);
+    console.log('头像ID:', user.userInfo.avatarUrlId);
+    
     this.setData({
       user: user,
       badgeName: badgeInfo.displayName,
       badgeClass: badgeInfo.className,
     });
+    
+    console.log('=== loadUser 加载用户信息完成 ===');
   },
 })
