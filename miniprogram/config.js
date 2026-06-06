@@ -6,7 +6,7 @@
 
 module.exports = {
   // 版本号
-  app_version: "v0.0.3",
+  app_version: "v0.0.5",
   // 小程序appid
   app_id: "wx53e30bc1bd417ee2",
   // EMAS空间ID
@@ -15,7 +15,7 @@ module.exports = {
   space_secret: require('./appSecret').space_secret,
   // 服务空间地址Api Endpoint
   space_endpoint: "https://api.next.bspapp.com",
-  use_private_tencent_cos: true,
+  use_private_tencent_cos: false,
   // 私有的腾讯云cos签名过期时间（秒）
   sign_expires_tencent_cos: 3600 * 2,
   // 图片选择数量限制

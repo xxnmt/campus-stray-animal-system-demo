@@ -25,10 +25,17 @@ async function uploadFile(options) {
   const filePath = options.filePath;
 
   if (!use_private_tencent_cos) {
-    return await app.mpServerless.file.uploadFile({
+    console.log('使用EMAS内置云存储上传文件:', fileName);
+    const result = await app.mpServerless.file.uploadFile({
       filePath: filePath, // 小程序临时文件路径
       cloudPath: fileName, // 上传至云端的路径
-    })
+    });
+    console.log('EMAS上传结果:', result);
+    // 确保返回值有统一的格式
+    return {
+      fileId: result.fileId || result.fileID || '',
+      fileUrl: result.fileUrl || result.url || ''
+    };
   }
 
   const data = (await api.getURL({
@@ -46,7 +53,7 @@ async function uploadFile(options) {
       success(res) {
         console.log('cloud.uploadFile success', res);
         // wx.uploadFile 和 wx.cloud.uplaodFile 返回值不一样
-        // TODO 生成 fileID 按wxcloud生成的是图片的地址
+        // TODO 生成 fileId 按 wxcloud生成的是图片的地址
         const cleanKey = formData.key.startsWith("/") ? formData.key.slice(1) : formData.key;
         res.fileUrl = postURL + cleanKey;
         res.fileId = '';
