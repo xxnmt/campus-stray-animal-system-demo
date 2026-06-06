@@ -6,11 +6,11 @@
 
 module.exports = {
   // 版本号
-  app_version: "v1.18.5",
+  app_version: "v0.0.3",
   // 小程序appid
   app_id: "wx53e30bc1bd417ee2",
   // EMAS空间ID
-  space_id: "mp-2584747c-b8b8-4cdf-8d91-af7e74c86393",
+  space_id: "mp-0a997189-b0ef-4baa-8519-a6d7a0024d85",
   // 服务空间 secret key
   space_secret: require('./appSecret').space_secret,
   // 服务空间地址Api Endpoint
@@ -23,24 +23,24 @@ module.exports = {
 
   // 科普页图片
   science_imgs: [
-    `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/科普1.png`,
-    `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/科普2.png`,
-    `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/科普3.png`,
-    `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/科普4.png`,
-    `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/科普5.png`
+    `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/科普1.png`,
+    `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/科普2.png`,
+    `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/科普3.png`,
+    `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/科普4.png`,
+    `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/科普5.png`
   ],
 
   // 赞赏码图片
-  reward_img: `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/赞赏码.jpg`,
+  reward_img: `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/赞赏码.jpg`,
   // 新猫问卷图片
-  feedback_wj_img: `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/新猫问卷.png`,
+  feedback_wj_img: `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/新猫问卷.png`,
   // 小程序菊花码图片
-  mpcode_img: `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/菊花码.jpg`,
+  mpcode_img: `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/菊花码.jpg`,
 
   // 徽章排行榜的数量榜logo
-  badge_rank_count_img: `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/badge_rank_count.png`,
+  badge_rank_count_img: `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/badge_rank_count.png`,
   // 徽章排行榜的价值榜logo
-  badge_rank_score_img: `https://mp-2584747c-b8b8-4cdf-8d91-af7e74c86393.cdn.bspapp.com/系统/badge_rank_score.png`,
+  badge_rank_score_img: `https://mp-0a997189-b0ef-4baa-8519-a6d7a0024d85.cdn.bspapp.com/系统/badge_rank_score.png`,
 
   // 猫猫领养状态字符串，对应数据库cat.adopt中的数字下标
   cat_status_adopt: ["未领养", "已领养", "寻找领养中"],
