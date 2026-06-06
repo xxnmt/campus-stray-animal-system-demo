@@ -112,8 +112,5 @@
     "scope.camera": {
       "desc": "访问你的相机以拍摄照片"
     }
-  },
-  "requiredPrivateInfos": [
-    "chooseAvatar"
-  ]
+  }
 }
