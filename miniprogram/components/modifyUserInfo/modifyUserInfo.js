@@ -9,6 +9,8 @@ Component({
   data: {
     defaultAvatarUrl: "/pages/public/images/info/default_avatar.png",
     user: null,
+    tempAvatarUrl: '', // 临时头像路径，用于选择后立即回显
+    avatarTimestamp: 0 // 防缓存时间戳
   },
 
   properties: {
@@ -38,7 +40,9 @@ Component({
       
       if (avatarUrl) {
         this.setData({
+          tempAvatarUrl: avatarUrl,
           "user.userInfo.avatarUrl": avatarUrl,
+          avatarTimestamp: Date.now() // 更新时间戳防缓存
         });
       }
       console.log('=== onChooseAvatar 结束 ===');
@@ -62,7 +66,9 @@ Component({
         user.userInfo = {};
       }
       this.setData({
-        user: user
+        user: user,
+        tempAvatarUrl: '', // 清空临时路径
+        avatarTimestamp: 0 // 重置时间戳
       });
     },
 
@@ -110,6 +116,12 @@ Component({
         console.log('更新结果:', updateResult);
 
         wx.hideLoading();
+
+        // 上传成功后更新临时路径和时间戳，确保用户看到新头像
+        this.setData({
+          tempAvatarUrl: user.userInfo.avatarUrl || '',
+          avatarTimestamp: Date.now()
+        });
 
         // 发布更新事件
         removeCacheItem("current-user");

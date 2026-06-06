@@ -2,7 +2,7 @@
   <view id='big-circle'></view>
   <view class="user-container">
     <view class="avatar-container">
-      <image class="avatar" src="{{user.userInfo.avatarUrl || defaultAvatarUrl}}" mode="aspectFill"></image>
+      <image class="avatar" src="{{user.userInfo.avatarUrl || defaultAvatarUrl}}{{avatarTimestamp ? '?t=' + avatarTimestamp : ''}}" mode="aspectFill"></image>
     </view>
     <view class="userName-container">
       <text class="user-name">{{user.userInfo.nickName}}</text>

@@ -13,6 +13,7 @@ Page({
     defaultAvatarUrl: defaultAvatarUrl,
     user: null,
     showEdit: false,
+    avatarTimestamp: 0, // 防缓存时间戳
 
     // 一些菜单选项
     menu: [
@@ -168,8 +169,15 @@ Page({
       user: user,
       badgeName: badgeInfo.displayName,
       badgeClass: badgeInfo.className,
+      avatarTimestamp: Date.now() // 更新时间戳防缓存
     });
     
     console.log('=== loadUser 加载用户信息完成 ===');
+  },
+
+  // 处理用户信息更新事件
+  onUserInfoUpdated() {
+    console.log('=== onUserInfoUpdated 收到用户信息更新 ===');
+    this.loadUser(); // 重新加载用户信息
   },
 })

@@ -98,5 +98,22 @@
     "wxebadf544ddae62cb",
     "wxd45c635d754dbf59"
   ],
-  "usingComponents": {}
+  "usingComponents": {},
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "你的相册将用于保存图片"
+    },
+    "scope.album": {
+      "desc": "访问你的相册以选择照片"
+    },
+    "scope.camera": {
+      "desc": "访问你的相机以拍摄照片"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseAvatar"
+  ]
 }

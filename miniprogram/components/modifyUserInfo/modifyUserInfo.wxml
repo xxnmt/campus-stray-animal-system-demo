@@ -8,7 +8,7 @@
       <view class="overlay">
         <image class="overlay-icon" src='/pages/public/images/info/choose.png'></image>
       </view>
-      <image class="avatar" src="{{user.userInfo.avatarUrl || defaultAvatarUrl}}" mode="aspectFill"></image>
+      <image class="avatar" src="{{tempAvatarUrl || user.userInfo.avatarUrl || defaultAvatarUrl}}{{avatarTimestamp ? '?t=' + avatarTimestamp : ''}}" mode="aspectFill"></image>
     </button>
     <view class="label-small">昵称</view>
     <view class="label-tip">请输入昵称</view>
