@@ -93,6 +93,11 @@ Component({
         user.userInfo.avatarUrl = fileInfo.fileUrl;
         user.userInfo.avatarUrlId = fileInfo.fileId;
       }
+      
+      // 关键修复：在保存到数据库前再次清理 avatarUrl
+      if (user.userInfo && user.userInfo.avatarUrl) {
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+      }
 
       console.log('准备更新的用户信息:', user);
 

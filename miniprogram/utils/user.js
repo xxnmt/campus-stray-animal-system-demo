@@ -65,6 +65,11 @@ async function getUserInfo(openid, options) {
     console.log("user " + openid + " not existed.");
     return null;
   }
+  
+  // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+  if (result.userInfo && result.userInfo.avatarUrl) {
+    result.userInfo.avatarUrl = result.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+  }
 
   // 写入缓存（25-35min过期）
   setCacheItem(key, result, 0, randomInt(25, 35));
@@ -97,6 +102,10 @@ async function getUserInfoMulti(openids, cacheOptions, retMap) {
   if (not_found.length) {
     var { result: db_res } = await app.mpServerless.db.collection('user').find({ openid: { $in: not_found } });
     for (var user of db_res) {
+      // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+      if (user.userInfo && user.userInfo.avatarUrl) {
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+      }
       const cacheKey = `uinfo-${user.openid}`;
       setCacheItem(cacheKey, user, 0, randomInt(25, 35));
       res[user.openid] = user;

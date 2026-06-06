@@ -43,6 +43,12 @@ module.exports = async (ctx) => {
       delete user._id; // 因为数据库不能更新_id
       delete user.openid; // 这个键唯一
       delete user.manager; // 不能用这个函数更新
+      
+      // 关键修复：清理 avatarUrl 中的反引号、空格和其他多余字符
+      if (user.userInfo && user.userInfo.avatarUrl) {
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+      }
+      
       await ctx.mpserverless.db.collection('user').updateOne({
         _id: _id
       }, {
