@@ -40,31 +40,7 @@ async function getUser(options) {
     openid: openid
   }));
   if (userRes && userRes.userInfo) {
-    // 处理EMAS云存储的头像URL
-    let avatarUrl = userRes.userInfo.avatarUrl;
-    const avatarUrlId = userRes.userInfo.avatarUrlId;
-    
-    // 如果只有fileId没有URL，或者URL看起来是fileId格式，尝试获取临时链接
-    if (!avatarUrl || (avatarUrlId && !avatarUrl.startsWith('http'))) {
-      try {
-        const app = getApp();
-        if (app.mpServerless && !config.use_private_tencent_cos) {
-          const tempUrlResult = await app.mpServerless.file.getTempFileURL({
-            fileList: [avatarUrlId || avatarUrl]
-          });
-          console.log('获取用户头像临时链接结果:', tempUrlResult);
-          if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
-            const fileItem = tempUrlResult.fileList[0];
-            avatarUrl = fileItem.tempFileURL || fileItem.url || fileItem.fileUrl || avatarUrl;
-          }
-        }
-      } catch (e) {
-        console.error('获取用户头像临时链接失败:', e);
-      }
-    }
-    
-    // 如果是腾讯云COS，仍然需要签名
-    userRes.userInfo.avatarUrl = await signCosUrl(avatarUrl);
+    userRes.userInfo.avatarUrl = await signCosUrl(userRes.userInfo.avatarUrl);
   }
 
   setCacheItem(key, userRes, 0, randomInt(25, 35))
@@ -272,31 +248,8 @@ async function fillUserInfo(items, openidKey, userInfoKey, cacheOptions) {
     const openid = item[openidKey];
     item[userInfoKey] = res[openid]?.userInfo;
     console.log(item[userInfoKey]);
-    if (item[userInfoKey]?.avatarUrl || item[userInfoKey]?.avatarUrlId) {
-      let avatarUrl = item[userInfoKey].avatarUrl;
-      const avatarUrlId = item[userInfoKey].avatarUrlId;
-      
-      // 处理EMAS云存储的头像URL
-      if (!avatarUrl || (avatarUrlId && !avatarUrl.startsWith('http'))) {
-        try {
-          const app = getApp();
-          if (app.mpServerless && !config.use_private_tencent_cos) {
-            const tempUrlResult = await app.mpServerless.file.getTempFileURL({
-              fileList: [avatarUrlId || avatarUrl]
-            });
-            console.log('fillUserInfo获取用户头像临时链接结果:', tempUrlResult);
-            if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
-              const fileItem = tempUrlResult.fileList[0];
-              avatarUrl = fileItem.tempFileURL || fileItem.url || fileItem.fileUrl || avatarUrl;
-            }
-          }
-        } catch (e) {
-          console.error('fillUserInfo获取用户头像临时链接失败:', e);
-        }
-      }
-      
-      // 如果是腾讯云COS，仍然需要签名
-      item[userInfoKey].avatarUrl = await signCosUrl(avatarUrl);
+    if (item[userInfoKey]?.avatarUrl) {
+      item[userInfoKey].avatarUrl = await signCosUrl(item[userInfoKey].avatarUrl);
     }
   }
   return;

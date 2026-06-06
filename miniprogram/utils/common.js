@@ -25,32 +25,21 @@ async function uploadFile(options) {
   const filePath = options.filePath;
 
   if (!use_private_tencent_cos) {
-    console.log('使用EMAS内置云存储上传文件:', fileName);
+    console.log('使用EMAS内置云存储上传文件, 路径:', fileName);
     const result = await app.mpServerless.file.uploadFile({
       filePath: filePath, // 小程序临时文件路径
       cloudPath: fileName, // 上传至云端的路径
     });
-    console.log('EMAS上传结果:', result);
+    console.log('=== EMAS上传完整结果 ===');
+    console.log(JSON.stringify(result, null, 2));
+    console.log('=== EMAS上传结果结束 ===');
     
-    // 获取EMAS云存储的临时访问链接 - 尝试多种可能的返回值格式
-    let fileId = result.fileId || result.fileID || result.id || '';
+    // 兼容多种可能的返回值格式
+    let fileId = result.fileId || result.fileID || '';
     let fileUrl = result.fileUrl || result.url || '';
     
-    // 如果有fileId，优先尝试获取临时链接
-    if (fileId) {
-      try {
-        const tempUrlResult = await app.mpServerless.file.getTempFileURL({
-          fileList: [fileId]
-        });
-        console.log('获取EMAS临时链接结果:', tempUrlResult);
-        if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
-          const fileItem = tempUrlResult.fileList[0];
-          fileUrl = fileItem.tempFileURL || fileItem.url || fileItem.fileUrl || fileUrl;
-        }
-      } catch (e) {
-        console.error('获取EMAS临时链接失败:', e);
-      }
-    }
+    console.log('提取到的 fileId:', fileId);
+    console.log('提取到的 fileUrl:', fileUrl);
     
     return {
       fileId: fileId,
