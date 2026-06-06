@@ -31,10 +31,30 @@ async function uploadFile(options) {
       cloudPath: fileName, // 上传至云端的路径
     });
     console.log('EMAS上传结果:', result);
-    // 确保返回值有统一的格式
+    
+    // 获取EMAS云存储的临时访问链接 - 尝试多种可能的返回值格式
+    let fileId = result.fileId || result.fileID || result.id || '';
+    let fileUrl = result.fileUrl || result.url || '';
+    
+    // 如果有fileId，优先尝试获取临时链接
+    if (fileId) {
+      try {
+        const tempUrlResult = await app.mpServerless.file.getTempFileURL({
+          fileList: [fileId]
+        });
+        console.log('获取EMAS临时链接结果:', tempUrlResult);
+        if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
+          const fileItem = tempUrlResult.fileList[0];
+          fileUrl = fileItem.tempFileURL || fileItem.url || fileItem.fileUrl || fileUrl;
+        }
+      } catch (e) {
+        console.error('获取EMAS临时链接失败:', e);
+      }
+    }
+    
     return {
-      fileId: result.fileId || result.fileID || '',
-      fileUrl: result.fileUrl || result.url || ''
+      fileId: fileId,
+      fileUrl: fileUrl
     };
   }
 

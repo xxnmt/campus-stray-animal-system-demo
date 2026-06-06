@@ -137,7 +137,7 @@ Component({
       // 上传图片
       let upRes = await uploadFile({
         filePath: tempFilePath, // 小程序临时文件路径
-        cloudPath: `/user/avatar/${openid}.${ext}`, // 上传至云端的路径
+        cloudPath: `user/avatar/${openid}.${ext}`, // 上传至云端的路径（不要开头的斜杠）
       })
 
       console.log('upRes', upRes);
