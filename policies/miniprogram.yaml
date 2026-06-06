@@ -1,0 +1,112 @@
+- collectionName: badge
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: badge_code
+  rules:
+    read: false
+    count: false
+    update: false
+    remove: false
+    add: false
+- collectionName: badge_def
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: badge_rank
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: cat
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: comment
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: openid
+- collectionName: feedback
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: openid
+- collectionName: inter
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: openid
+- collectionName: news
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: photo
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: openid
+- collectionName: photo_rank
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: rating
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: openid
+- collectionName: reward
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: science
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: setting
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
+- collectionName: user
+  rules:
+    read: openid
+    count: openid
+    update: false
+    remove: false
+    add: false
