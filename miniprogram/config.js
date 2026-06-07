@@ -6,7 +6,7 @@
 
 module.exports = {
   // 版本号
-  app_version: "v0.0.5",
+  app_version: "v0.0.7",
   // 小程序appid
   app_id: "wx53e30bc1bd417ee2",
   // EMAS空间ID
@@ -50,7 +50,7 @@ module.exports = {
   // 各种文字内容
   text: {
     // 小程序名
-    app_name: "笃行猫谱",
+    app_name: "HBUT猫圈",
     // 首页，pages/genealogy/genealogy
     genealogy: {
       share_tip: "发现身边校园猫咪",
@@ -147,8 +147,8 @@ module.exports = {
     },
     // 开发团队页，pages/info/devTeam/devTeam
     dev_team: {
-      share_tip: "开发团队",
-      team: "程序开发：渔政、蓝卷、XD、zJ、ArcherJo、yw、lauzeyu、xuannfx、LightHouse-1024\n资料维护：Lo\n初期资料整理：hehe、玥琪、大米\n以及各校区猫群的小伙伴~\n非常欢迎新朋友加入设计开发哇~！",
+      share_tip: "开发者",
+      team: "程序开发：小小柠檬兔（柴昂）、星沫海（周文浩）、落叶（龙澎宇）、（王梓涵）\n",
     },
     // 识猫页，pages/recognize/recognize
     recognize: {

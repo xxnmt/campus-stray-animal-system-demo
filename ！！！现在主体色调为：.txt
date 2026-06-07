@@ -1,0 +1,1 @@
+python themeChanging.py "#ffd101" "#66CCFF"

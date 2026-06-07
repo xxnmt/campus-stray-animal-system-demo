@@ -17,6 +17,7 @@ def extract_colors_from_folder(png_files):
     print("组件图片总数:", len(png_files))
     for png_file in tqdm(png_files, desc='提取颜色并验证', ncols=100):
         img = Image.open(png_file)
+        img = img.convert('RGBA')  # 确保所有图片都是 RGBA 格式
         pixels = img.getdata()
 
         for pixel in pixels:
@@ -89,6 +90,7 @@ def color_distance(color1, color2):
 def replace_color_in_images(png_files, replace_dic , tolerance = 50):
     for png_file in tqdm(png_files, desc='置换中', ncols=100):
         img = Image.open(png_file)
+        img = img.convert('RGBA')  # 确保所有图片都是 RGBA 格式
         pixels = img.load()
         width, height = img.size
         for color_origin in replace_dic:
@@ -97,7 +99,9 @@ def replace_color_in_images(png_files, replace_dic , tolerance = 50):
             for x in range(width):
                 for y in range(height):
                     if color_distance(pixels[x, y], colour_origin_rgb) < tolerance:
-                        pixels[x, y] = colour_aim_rgb
+                        # 保持原透明度
+                        alpha = pixels[x, y][3] if len(pixels[x, y]) > 3 else 255
+                        pixels[x, y] = (*colour_aim_rgb, alpha)
             img.save(png_file)
 
 
