@@ -186,7 +186,9 @@ Component({
       //获取后缀
       const index = tempFilePath.lastIndexOf(".");
       const ext = tempFilePath.substr(index + 1);
-      const cloudPath = `/user/avatar/${openid}.${ext}`;
+      // 使用时间戳确保每次上传都是新文件，避免EMAS缓存问题
+      const timestamp = Date.now();
+      const cloudPath = `/user/avatar/${openid}_${timestamp}.${ext}`;
       console.log('准备上传，cloudPath:', cloudPath);
       
       // 上传图片

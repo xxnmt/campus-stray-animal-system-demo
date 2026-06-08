@@ -28,19 +28,27 @@ v0.0.7 (体验版)
 
 ## v0.0.7 (体验版) 修改报告
 
-### 恢复头像上传逻辑至原项目版本
+### 修复头像上传和全局显示问题
 **文件**：
 - `miniprogram/components/modifyUserInfo/modifyUserInfo.js`
+- `miniprogram/components/modifyUserInfo/modifyUserInfo.wxml`
+- `miniprogram/components/modifyUserInfo/modifyUserInfo.wxss`
 - `miniprogram/utils/common.js`
 - `miniprogram/utils/user.js`
 - `functionsEMAS/unionOp/userOp.js`
-- `miniprogram/pages/info/userInfo/userInfo.js`  
+- `miniprogram/pages/info/userInfo/userInfo.js`
+- `miniprogram/pages/genealogy/commentBoard/commentBoard.js`
+- `miniprogram/pages/genealogy/feedbackDetail/feedbackDetail.js`
+- `miniprogram/components/photoRank/photoRank.js`
+- `miniprogram/pages/followFeed/followFeed.js`
+- `miniprogram/pages/manage/managers/managers.js`
+
 **内容**：
-- 移除所有多余的 URL 清理逻辑
-- 移除图片压缩功能
-- 恢复简洁的 `uploadAvatar` 和 `uploadFile` 函数
-- 移除云函数中的 URL 清理逻辑
-- 与原项目 `zhongdamaopu-1.18.5-2` 的上传逻辑保持一致
+1. **修复头像选择缓存问题**：使用 `wx.chooseMedia` API 替代 `button open-type="chooseAvatar"`，避免微信小程序的头像缓存机制
+2. **修复云存储上传问题**：在头像上传路径中添加时间戳，确保每次上传都是新文件，避免 EMAS 缓存问题
+3. **修复全局头像显示问题**：为所有显示用户头像的页面添加 `userInfoUpdated` 事件监听，确保头像更新后全局同步
+4. **优化缓存清理机制**：调整缓存清理和事件发布的时序，确保其他页面能获取到最新头像
+5. **移除冗余逻辑**：移除所有多余的 URL 清理逻辑，恢复简洁的上传流程
 
 ---
 
