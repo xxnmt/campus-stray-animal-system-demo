@@ -53,6 +53,10 @@ Page({
    * 生命周期函数--监听页面加载
    */
   async onLoad() {
+    // 监听用户信息更新事件
+    this.boundOnUserInfoUpdated = this.onUserInfoUpdated.bind(this);
+    app.globalData.eventBus.$on('userInfoUpdated', this.boundOnUserInfoUpdated);
+
     // 标记是否需要重新加载Feed数据
     let needRefreshFeed = true;
     let needIncrementalUpdate = false;
@@ -152,6 +156,21 @@ Page({
   onUnload() {
     // 页面卸载时保存数据到缓存
     this._saveDataToCache();
+    // 移除用户信息更新事件监听
+    app.globalData.eventBus.$off('userInfoUpdated', this.boundOnUserInfoUpdated);
+  },
+
+  // 处理用户信息更新事件
+  async onUserInfoUpdated() {
+    console.log('=== followFeed onUserInfoUpdated 收到用户信息更新 ===');
+    // 重新加载用户信息
+    const user = await getUser({ nocache: true });
+    this.setData({ user });
+    // 重新加载Feed数据
+    this.resetFeedData();
+    await this.loadFollowCats();
+    await this.loadFollowCatsDetail();
+    await this.loadFeed();
   },
 
   /**

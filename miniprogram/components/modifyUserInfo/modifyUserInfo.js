@@ -145,11 +145,17 @@ Component({
           avatarTimestamp: Date.now()
         });
 
-        // 发布更新事件
+        // 先清理缓存，确保其他页面不会从缓存中获取旧数据
         removeCacheItem("current-user");
-        // 关键修复：同时清理 uinfo-${openid} 缓存，确保其他页面能获取到新头像
+        // 清理 uinfo-${openid} 缓存，确保其他页面能获取到新头像
         removeCacheItem(`uinfo-${openid}`);
-        app.globalData.eventBus.$emit('userInfoUpdated');
+        console.log('已清理缓存: current-user, uinfo-' + openid);
+
+        // 延迟发布更新事件，确保缓存清理完成
+        setTimeout(() => {
+          console.log('发布 userInfoUpdated 事件');
+          app.globalData.eventBus.$emit('userInfoUpdated');
+        }, 100);
 
         this.hide();
         wx.showToast({

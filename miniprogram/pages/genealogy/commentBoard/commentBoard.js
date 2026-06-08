@@ -75,10 +75,15 @@ Page({
   },
   
   // 处理用户信息更新事件
-  onUserInfoUpdated() {
+  async onUserInfoUpdated() {
     console.log('=== commentBoard onUserInfoUpdated 收到用户信息更新 ===');
+    // 清空评论列表，重新加载所有评论
+    this.setData({
+      comments: [],
+      loadNoMore: false
+    });
     // 强制刷新评论列表中的用户头像
-    this.loadMoreComment();
+    await this.loadMoreComment();
   },
 
   /**

@@ -32,10 +32,25 @@ Page({
     this.setData({
       canFeedback: await checkCanFeedback()
     });
+
+    // 监听用户信息更新事件
+    this.boundOnUserInfoUpdated = this.onUserInfoUpdated.bind(this);
+    app.globalData.eventBus.$on('userInfoUpdated', this.boundOnUserInfoUpdated);
   },
 
   async onShow() {
     await getPageUserInfo(this);
+  },
+
+  // 处理用户信息更新事件
+  async onUserInfoUpdated() {
+    console.log('=== feedbackDetail onUserInfoUpdated 收到用户信息更新 ===');
+    await getPageUserInfo(this, true); // 传递 nocache: true 强制刷新
+  },
+
+  onUnload: function () {
+    // 移除用户信息更新事件监听
+    app.globalData.eventBus.$off('userInfoUpdated', this.boundOnUserInfoUpdated);
   },
 
   /**

@@ -24,13 +24,13 @@ Component({
 
   lifetimes: {
     async attached() {
-      this.boundGetPageUserInfo = getPageUserInfo.bind(this, this);
+      this.boundOnUserInfoUpdated = this.onUserInfoUpdated.bind(this);
       // 监听用户信息更新事件
-      app.globalData.eventBus.$on('userInfoUpdated', this.boundGetPageUserInfo);
+      app.globalData.eventBus.$on('userInfoUpdated', this.boundOnUserInfoUpdated);
     },
     detached() {
       // 移除用户信息更新事件监听
-      app.globalData.eventBus.$off('userInfoUpdated', this.boundGetPageUserInfo);
+      app.globalData.eventBus.$off('userInfoUpdated', this.boundOnUserInfoUpdated);
     }
   },
 
@@ -38,6 +38,11 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    async onUserInfoUpdated() {
+      console.log('=== photoRank onUserInfoUpdated 收到用户信息更新 ===');
+      await getPageUserInfo(this, true); // 传递 nocache: true 强制刷新
+    },
+
     async reloadData() {
       this.getRank();
       await getPageUserInfo(this);
