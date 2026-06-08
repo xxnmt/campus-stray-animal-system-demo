@@ -79,7 +79,7 @@ Page({
   },
 
   async onUserInfoUpdated() {
-    await getPageUserInfo(this);
+    await getPageUserInfo(this, true); // 传递 nocache: true 强制刷新
   },
 
   /**

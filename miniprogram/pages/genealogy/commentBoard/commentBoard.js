@@ -52,6 +52,10 @@ Page({
     this.setData({
       canComment: await checkCanComment()
     })
+    
+    // 监听用户信息更新事件
+    app.globalData.eventBus.$on('userInfoUpdated', this.onUserInfoUpdated.bind(this));
+    
     // 启动加载
     await Promise.all([
       this.loadCat(),
@@ -67,6 +71,13 @@ Page({
     } else {
       console.log("not a manager");
     }
+  },
+  
+  // 处理用户信息更新事件
+  onUserInfoUpdated() {
+    console.log('=== commentBoard onUserInfoUpdated 收到用户信息更新 ===');
+    // 强制刷新评论列表中的用户头像
+    this.loadMoreComment();
   },
 
   /**

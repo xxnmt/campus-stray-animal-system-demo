@@ -23,10 +23,19 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: async function (options) {
+    // 监听用户信息更新事件
+    app.globalData.eventBus.$on('userInfoUpdated', this.onUserInfoUpdated.bind(this));
+    
     if (await checkAuth(this, 99)) {
       await this.loadUsers(true);
       this.getHeights();
     }
+  },
+  
+  // 处理用户信息更新事件
+  onUserInfoUpdated() {
+    console.log('=== onUserInfoUpdated 收到用户信息更新 ===');
+    this.loadUsers(true); // 重新加载用户列表
   },
 
   /**

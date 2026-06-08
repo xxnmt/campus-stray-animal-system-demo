@@ -196,9 +196,9 @@ async function checkCanShowNews() {
 }
 
 // 设置页面上的userInfo
-async function getPageUserInfo(page) {
+async function getPageUserInfo(page, nocache) {
   // 检查用户信息有没有拿到，如果有就更新this.data
-  const userRes = await getUser();
+  const userRes = await getUser({ nocache: nocache || false });
   if (!userRes.userInfo || !userRes.userInfo == {}) {
     console.log('无用户信息');
     return false;

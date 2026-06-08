@@ -178,6 +178,6 @@ Page({
   // 处理用户信息更新事件
   onUserInfoUpdated() {
     console.log('=== onUserInfoUpdated 收到用户信息更新 ===');
-    this.loadUser(); // 重新加载用户信息
+    this.loadUser(); // 重新加载用户信息（loadUser 内部已传递 nocache: true）
   },
 })

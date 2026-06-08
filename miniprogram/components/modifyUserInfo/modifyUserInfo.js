@@ -101,11 +101,20 @@ Component({
       }
       
       // 关键修复：在保存到数据库前再次清理 avatarUrl
+      // 使用更强大的正则表达式匹配各种引号和空白字符
       if (user.userInfo && user.userInfo.avatarUrl) {
-        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+        const oldUrl = user.userInfo.avatarUrl;
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl
+          .trim()
+          .replace(/[`'"“”‘’´`]/g, '')  // 匹配各种引号字符
+          .replace(/\s+/g, '');         // 移除所有空白字符
+        console.log('清理前的 avatarUrl:', oldUrl);
+        console.log('清理后的 avatarUrl:', user.userInfo.avatarUrl);
       }
 
       console.log('准备更新的用户信息:', user);
+      console.log('avatarUrlId:', user.userInfo?.avatarUrlId);
+      console.log('avatarUrl:', user.userInfo?.avatarUrl);
 
       try {
         // 更新数据库的userInfo
