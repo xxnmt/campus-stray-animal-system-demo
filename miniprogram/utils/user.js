@@ -85,20 +85,27 @@ async function getUserInfoMulti(openids, cacheOptions, retMap) {
   }
   var res = {};
   var not_found = [];
-  for (var openid of openids) {
-    if (res[openid]) {
-      continue;
+  
+  // 如果启用了 nocache，所有用户都从数据库获取
+  if (cacheOptions?.nocache) {
+    not_found = [...openids];
+  } else {
+    // 正常模式：先从缓存获取
+    for (var openid of openids) {
+      if (res[openid]) {
+        continue;
+      }
+      const cacheKey = `uinfo-${openid}`;
+      var cacheItem = getCacheItem(cacheKey, cacheOptions);
+      if (cacheItem) {
+        res[openid] = cacheItem;
+        continue;
+      }
+      not_found.push(openid);
     }
-    const cacheKey = `uinfo-${openid}`;
-    var cacheItem = getCacheItem(cacheKey, cacheOptions);
-    if (cacheItem) {
-      res[openid] = cacheItem;
-      continue;
-    }
-    not_found.push(openid);
   }
 
-  // 请求没有的
+  // 请求没有的（或 nocache 模式下所有用户）
   if (not_found.length) {
     var { result: db_res } = await app.mpServerless.db.collection('user').find({ openid: { $in: not_found } });
     for (var user of db_res) {
@@ -247,12 +254,21 @@ async function setUserRole(openid, role) {
 async function fillUserInfo(items, openidKey, userInfoKey, cacheOptions) {
   var openids = [];
   for (var item of items) {
-    if (item[userInfoKey] != undefined) {
-      continue;
+    // 如果启用了 nocache，或者用户信息不存在/为空对象，都需要重新获取
+    const needRefresh = cacheOptions?.nocache || 
+                        item[userInfoKey] == undefined || 
+                        (typeof item[userInfoKey] === 'object' && Object.keys(item[userInfoKey]).length === 0);
+    
+    if (needRefresh) {
+      // 清空现有数据，强制重新获取
+      item[userInfoKey] = undefined;
+      const openid = item[openidKey];
+      if (openid) {
+        openids.push(openid);
+      }
     }
-    const openid = item[openidKey];
-    openids.push(openid);
   }
+  
   var res = await getUserInfoMulti(openids, cacheOptions, true);
   for (var item of items) {
     if (item[userInfoKey] != undefined) {

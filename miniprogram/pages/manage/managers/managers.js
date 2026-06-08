@@ -1,5 +1,5 @@
 // miniprogram/pages/manage/managers.js
-import { checkAuth } from "../../../utils/user";
+import { checkAuth, fillUserInfo } from "../../../utils/user";
 import api from "../../../utils/cloudApi";
 
 // 是否正在加载
@@ -39,8 +39,11 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
-
+  onShow: async function () {
+    // 页面显示时刷新用户列表，确保显示最新头像
+    if (this.data.auth) {
+      await this.loadUsers(true);
+    }
   },
 
   /**
@@ -102,6 +105,12 @@ Page({
     console.log("query", query);
     var { result: userRes } = await app.mpServerless.db.collection('user').find(query, { skip: users.length, limit: 10 })
     console.log(userRes);
+    
+    // 填充用户信息（包含最新头像），强制刷新缓存
+    if (userRes.length > 0) {
+      await fillUserInfo(userRes, "openid", "userInfo", { nocache: true });
+    }
+    
     wx.hideLoading();
     if (reload) {
       users = userRes;

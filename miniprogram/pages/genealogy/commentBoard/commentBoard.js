@@ -316,8 +316,8 @@ Page({
       return;
     }
 
-    // 填充userInfo
-    await fillUserInfo(res, "user_openid", "userInfo");
+    // 填充userInfo（强制刷新缓存，获取最新头像）
+    await fillUserInfo(res, "user_openid", "userInfo", { nocache: true });
     for (var item of res) {
       item.datetime = formatDate(new Date(item.create_date), "yyyy-MM-dd hh:mm:ss")
       // 便签旋转

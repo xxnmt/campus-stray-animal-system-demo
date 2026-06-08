@@ -125,6 +125,8 @@ Component({
 
         // 发布更新事件
         removeCacheItem("current-user");
+        // 关键修复：同时清理 uinfo-${openid} 缓存，确保其他页面能获取到新头像
+        removeCacheItem(`uinfo-${openid}`);
         app.globalData.eventBus.$emit('userInfoUpdated');
 
         this.hide();
