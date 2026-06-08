@@ -44,18 +44,6 @@ module.exports = async (ctx) => {
       delete user.openid; // 这个键唯一
       delete user.manager; // 不能用这个函数更新
       
-      // 关键修复：清理 avatarUrl 中的反引号、空格和其他多余字符
-      // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
-      if (user.userInfo && user.userInfo.avatarUrl) {
-        const urlMatch = user.userInfo.avatarUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
-        if (urlMatch) {
-          user.userInfo.avatarUrl = urlMatch[0];
-        } else {
-          // 如果匹配失败，尝试清理所有非 URL 字符
-          user.userInfo.avatarUrl = user.userInfo.avatarUrl.replace(/[^a-zA-Z0-9:/._-]/g, '').replace(/\/+/g, '/');
-        }
-      }
-      
       await ctx.mpserverless.db.collection('user').updateOne({
         _id: _id
       }, {

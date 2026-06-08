@@ -40,17 +40,6 @@ async function getUser(options) {
     openid: openid
   }));
   if (userRes && userRes.userInfo) {
-    // 关键修复：清理 URL 中的反引号、空格和其他多余字符
-    // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
-    if (userRes.userInfo.avatarUrl) {
-      const urlMatch = userRes.userInfo.avatarUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
-      if (urlMatch) {
-        userRes.userInfo.avatarUrl = urlMatch[0];
-      } else {
-        // 如果匹配失败，尝试清理所有非 URL 字符
-        userRes.userInfo.avatarUrl = userRes.userInfo.avatarUrl.replace(/[^a-zA-Z0-9:/._-]/g, '').replace(/\/+/g, '/');
-      }
-    }
     userRes.userInfo.avatarUrl = await signCosUrl(userRes.userInfo.avatarUrl);
   }
 
@@ -71,11 +60,6 @@ async function getUserInfo(openid, options) {
   if (!result) {
     console.log("user " + openid + " not existed.");
     return null;
-  }
-  
-  // 关键修复：清理 URL 中的反引号、空格和其他多余字符
-  if (result.userInfo && result.userInfo.avatarUrl) {
-    result.userInfo.avatarUrl = result.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
   }
 
   // 写入缓存（25-35min过期）
@@ -116,17 +100,6 @@ async function getUserInfoMulti(openids, cacheOptions, retMap) {
   if (not_found.length) {
     var { result: db_res } = await app.mpServerless.db.collection('user').find({ openid: { $in: not_found } });
     for (var user of db_res) {
-      // 关键修复：清理 URL 中的反引号、空格和其他多余字符
-      // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
-      if (user.userInfo && user.userInfo.avatarUrl) {
-        const urlMatch = user.userInfo.avatarUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
-        if (urlMatch) {
-          user.userInfo.avatarUrl = urlMatch[0];
-        } else {
-          // 如果匹配失败，尝试清理所有非 URL 字符
-          user.userInfo.avatarUrl = user.userInfo.avatarUrl.replace(/[^a-zA-Z0-9:/._-]/g, '').replace(/\/+/g, '/');
-        }
-      }
       const cacheKey = `uinfo-${user.openid}`;
       setCacheItem(cacheKey, user, 0, randomInt(25, 35));
       res[user.openid] = user;

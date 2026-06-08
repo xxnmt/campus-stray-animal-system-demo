@@ -25,53 +25,10 @@ async function uploadFile(options) {
   const filePath = options.filePath;
 
   if (!use_private_tencent_cos) {
-    console.log('=== EMAS上传开始 ===');
-    console.log('上传文件路径:', filePath);
-    console.log('云端存储路径:', fileName);
-    
-    let result;
-    try {
-      result = await app.mpServerless.file.uploadFile({
-        filePath: filePath, // 小程序临时文件路径
-        cloudPath: fileName, // 上传至云端的路径
-      });
-      console.log('=== EMAS上传完整结果 ===');
-      console.log(JSON.stringify(result, null, 2));
-      console.log('=== EMAS上传结果结束 ===');
-    } catch (uploadError) {
-      console.error('=== EMAS上传失败 ===');
-      console.error('错误信息:', uploadError);
-      console.error('错误详情:', JSON.stringify(uploadError, null, 2));
-      throw uploadError;
-    }
-    
-    // 兼容多种可能的返回值格式
-    let fileId = result.fileId || result.fileID || '';
-    let fileUrl = result.fileUrl || result.url || '';
-    
-    // 关键修复：清理 URL 中的反引号、空格和其他多余字符
-    // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
-    if (fileUrl) {
-      const urlMatch = fileUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
-      if (urlMatch) {
-        fileUrl = urlMatch[0];
-      } else {
-        // 如果匹配失败，尝试清理所有非 URL 字符
-        fileUrl = fileUrl.replace(/[^a-zA-Z0-9:/._-]/g, '').replace(/\/+/g, '/');
-      }
-    }
-    if (fileId) {
-      fileId = fileId.replace(/[^a-zA-Z0-9:/._-]/g, '').replace(/\/+/g, '/');
-    }
-    
-    console.log('提取到的 fileId:', fileId);
-    console.log('提取到的 fileUrl:', fileUrl);
-    console.log('=== EMAS上传结束 ===');
-    
-    return {
-      fileId: fileId,
-      fileUrl: fileUrl,
-    };
+    return await app.mpServerless.file.uploadFile({
+      filePath: filePath, // 小程序临时文件路径
+      cloudPath: fileName, // 上传至云端的路径
+    })
   }
 
   const data = (await api.getURL({

@@ -1,5 +1,5 @@
 import { getUser } from "../../utils/user";
-import { deepcopy, compressImage } from "../../utils/utils";
+import { deepcopy } from "../../utils/utils";
 import api from "../../utils/cloudApi";
 import { uploadFile } from "../../utils/common";
 import { removeCacheItem } from '../../utils/cache';
@@ -30,13 +30,8 @@ Component({
 
   methods: {
     onChooseAvatar(e) {
-      console.log('=== onChooseAvatar 完整信息 ===');
-      console.log('事件对象:', e);
-      
       // 兼容不同的返回格式
       let avatarUrl = e.detail && e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : e.detail;
-      
-      console.log('选择的头像 URL:', avatarUrl);
       
       if (avatarUrl) {
         this.setData({
@@ -45,7 +40,6 @@ Component({
           avatarTimestamp: Date.now() // 更新时间戳防缓存
         });
       }
-      console.log('=== onChooseAvatar 结束 ===');
     },
 
     onChangeNickName(e) {
@@ -99,25 +93,6 @@ Component({
         user.userInfo.avatarUrl = fileInfo.fileUrl;
         user.userInfo.avatarUrlId = fileInfo.fileId;
       }
-      
-      // 关键修复：在保存到数据库前再次清理 avatarUrl
-      // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
-      if (user.userInfo && user.userInfo.avatarUrl) {
-        const oldUrl = user.userInfo.avatarUrl;
-        // 使用正则表达式提取 URL 部分
-        const urlMatch = user.userInfo.avatarUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
-        if (urlMatch) {
-          user.userInfo.avatarUrl = urlMatch[0];
-        } else {
-          // 如果匹配失败，尝试清理所有非 URL 字符
-          user.userInfo.avatarUrl = user.userInfo.avatarUrl
-            .replace(/[^a-zA-Z0-9:/._-]/g, '')
-            .replace(/\/+/g, '/');
-        }
-        console.log('清理前的 avatarUrl:', oldUrl);
-        console.log('清理后的 avatarUrl:', user.userInfo.avatarUrl);
-        console.log('清理后是否还包含反引号:', user.userInfo.avatarUrl.includes('`'));
-      }
 
       console.log('准备更新的用户信息:', user);
       console.log('avatarUrlId:', user.userInfo?.avatarUrlId);
@@ -163,119 +138,23 @@ Component({
     },
 
     async uploadAvatar(tempFilePath) {
-      console.log('=== uploadAvatar 开始 ===');
-      console.log('传入的 tempFilePath:', tempFilePath);
-      
       const openid = this.data.user.openid;
-      let filePathToUpload = tempFilePath;
-      
-      // 首先获取文件信息
-      let fileSize = 0;
-      try {
-        const fileInfo = await wx.getFileInfo({
-          filePath: tempFilePath
-        });
-        console.log('文件信息:', fileInfo);
-        fileSize = fileInfo.size;
-        console.log('文件大小:', fileSize, 'bytes');
-        console.log('文件大小(MB):', (fileSize / 1024 / 1024).toFixed(2));
-      } catch (err) {
-        console.warn('获取文件信息失败:', err);
-      }
-      
-      if (!tempFilePath || !tempFilePath.includes("://tmp")) {
-        console.log('不是临时文件路径，直接返回现有信息');
-        // 如果不是临时文件路径，直接返回现有信息
-        return { 
-          fileId: this.data.user.userInfo.avatarUrlId || '', 
-          fileUrl: tempFilePath || this.data.user.userInfo.avatarUrl 
-        };
+      if (!tempFilePath.includes("://tmp")) {
+        return { fileId: this.data.user.userInfo.avatarUrlId, fileUrl: tempFilePath };
       }
 
-      //获取后缀，如果没有后缀则默认为jpg
+      //获取后缀
       const index = tempFilePath.lastIndexOf(".");
-      let ext = index > 0 ? tempFilePath.substr(index + 1) : 'jpg';
-      ext = ext.toLowerCase();
-      console.log('文件扩展名:', ext);
-      
-      // 检查文件类型是否合法
-      const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-      if (!allowedExts.includes(ext)) {
-        console.warn('不支持的文件类型:', ext, '使用默认 jpg');
-        ext = 'jpg';
-      }
-      
-      // 如果图片大于 1MB，先压缩（和其他页面保持一致）
-      const MAX_SIZE = 1024 * 1024; // 1MB
-      if (fileSize > MAX_SIZE) {
-        console.log('文件大小超过 1MB，开始压缩...');
-        try {
-          filePathToUpload = await compressImage(tempFilePath, 80); // 80% 质量
-          console.log('压缩完成，新路径:', filePathToUpload);
-          
-          // 重新获取压缩后的文件大小
-          try {
-            const compressedInfo = await wx.getFileInfo({
-              filePath: filePathToUpload
-            });
-            console.log('压缩后文件大小:', compressedInfo.size, 'bytes');
-            console.log('压缩后文件大小(MB):', (compressedInfo.size / 1024 / 1024).toFixed(2));
-          } catch (err) {
-            console.warn('获取压缩后文件信息失败:', err);
-          }
-        } catch (compressErr) {
-          console.warn('压缩失败，使用原文件上传:', compressErr);
-          filePathToUpload = tempFilePath;
-        }
-      }
-      
-      console.log('上传路径:', `/user/avatar/${openid}.${ext}`);
-      console.log('实际上传的文件路径:', filePathToUpload);
-      
+      const ext = tempFilePath.substr(index + 1);
       // 上传图片
-      let upRes;
-      try {
-        upRes = await uploadFile({
-          filePath: filePathToUpload, // 小程序临时文件路径
-          cloudPath: `/user/avatar/${openid}.${ext}`, // 上传至云端的路径
-        });
-        console.log('上传结果 upRes:', upRes);
-      } catch (uploadError) {
-        console.error('=== 上传失败 ===');
-        console.error('错误信息:', uploadError);
-        console.error('错误详情:', JSON.stringify(uploadError, null, 2));
-        wx.showToast({
-          title: '头像上传失败',
-          icon: 'error',
-          duration: 2000
-        });
-        throw uploadError;
-      }
+      let upRes = await uploadFile({
+        filePath: tempFilePath, // 小程序临时文件路径
+        cloudPath: `/user/avatar/${openid}.${ext}`, // 上传至云端的路径
+      })
 
-      // 兼容不同的返回格式
-      let fileId = upRes.fileId || upRes.fileID || '';
-      let fileUrl = upRes.fileUrl || upRes.url || tempFilePath;
-      
-      // 关键修复：清理 URL 中的反引号、空格和其他多余字符
-      // 使用 Unicode 正则表达式匹配各种引号和空白字符
-      if (fileUrl) {
-        fileUrl = fileUrl
-          .trim()
-          .replace(/[\u0060\u2018\u2019\u201C\u201D\u2032\u2033\u0027\u0022]/g, '')  // 匹配各种引号字符
-          .replace(/[\s\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]/g, ''); // 移除所有空白字符
-      }
-      if (fileId) {
-        fileId = fileId
-          .trim()
-          .replace(/[\u0060\u2018\u2019\u201C\u201D\u2032\u2033\u0027\u0022]/g, '')
-          .replace(/[\s\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]/g, '');
-      }
-      
-      console.log('处理后的 fileId:', fileId);
-      console.log('处理后的 fileUrl:', fileUrl);
-      console.log('=== uploadAvatar 结束 ===');
-      
-      return { fileId: fileId, fileUrl: fileUrl };
+      console.log('upRes', upRes);
+
+      return { fileId: upRes.fileId, fileUrl: upRes.fileUrl };
     },
 
     async checkNickName(name) {
