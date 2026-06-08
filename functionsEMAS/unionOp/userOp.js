@@ -45,8 +45,12 @@ module.exports = async (ctx) => {
       delete user.manager; // 不能用这个函数更新
       
       // 关键修复：清理 avatarUrl 中的反引号、空格和其他多余字符
+      // 使用 Unicode 正则表达式匹配各种引号和空白字符
       if (user.userInfo && user.userInfo.avatarUrl) {
-        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl
+          .trim()
+          .replace(/[\u0060\u2018\u2019\u201C\u201D\u2032\u2033\u0027\u0022]/g, '')  // 匹配各种引号字符
+          .replace(/[\s\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]/g, ''); // 移除所有空白字符
       }
       
       await ctx.mpserverless.db.collection('user').updateOne({
