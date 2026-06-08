@@ -101,14 +101,19 @@ Component({
       }
       
       // 关键修复：在保存到数据库前再次清理 avatarUrl
-      // 使用更强大的正则表达式匹配各种引号和空白字符
+      // 使用正则表达式直接提取 URL 部分（从 http/https 开始到图片扩展名结束）
       if (user.userInfo && user.userInfo.avatarUrl) {
         const oldUrl = user.userInfo.avatarUrl;
-        // 使用 Unicode 正则表达式匹配各种引号字符
-        user.userInfo.avatarUrl = user.userInfo.avatarUrl
-          .trim()
-          .replace(/[\u0060\u2018\u2019\u201C\u201D\u2032\u2033\u0027\u0022]/g, '')  // 匹配各种引号字符
-          .replace(/[\s\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]/g, ''); // 移除所有空白字符
+        // 使用正则表达式提取 URL 部分
+        const urlMatch = user.userInfo.avatarUrl.match(/https?:\/\/[^\s`'"“”‘’´`]+?\.(png|jpg|jpeg|gif|webp)/i);
+        if (urlMatch) {
+          user.userInfo.avatarUrl = urlMatch[0];
+        } else {
+          // 如果匹配失败，尝试清理所有非 URL 字符
+          user.userInfo.avatarUrl = user.userInfo.avatarUrl
+            .replace(/[^a-zA-Z0-9:/._-]/g, '')
+            .replace(/\/+/g, '/');
+        }
         console.log('清理前的 avatarUrl:', oldUrl);
         console.log('清理后的 avatarUrl:', user.userInfo.avatarUrl);
         console.log('清理后是否还包含反引号:', user.userInfo.avatarUrl.includes('`'));
