@@ -22,7 +22,25 @@
 - 存储：EMAS 内置云存储
 
 ### 当前版本
-v0.0.6 (体验版)
+v0.0.7 (体验版)
+
+---
+
+## v0.0.7 (体验版) 修改报告
+
+### 恢复头像上传逻辑至原项目版本
+**文件**：
+- `miniprogram/components/modifyUserInfo/modifyUserInfo.js`
+- `miniprogram/utils/common.js`
+- `miniprogram/utils/user.js`
+- `functionsEMAS/unionOp/userOp.js`
+- `miniprogram/pages/info/userInfo/userInfo.js`  
+**内容**：
+- 移除所有多余的 URL 清理逻辑
+- 移除图片压缩功能
+- 恢复简洁的 `uploadAvatar` 和 `uploadFile` 函数
+- 移除云函数中的 URL 清理逻辑
+- 与原项目 `zhongdamaopu-1.18.5-2` 的上传逻辑保持一致
 
 ---
 
