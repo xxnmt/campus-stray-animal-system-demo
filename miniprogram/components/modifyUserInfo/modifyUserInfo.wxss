@@ -8,6 +8,7 @@
 }
 
 .avatar-wrapper {
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 270rpx;
@@ -19,6 +20,7 @@
   margin-bottom: 40rpx;
   border: 12rpx solid white;
   position: relative;
+  overflow: hidden;
 }
 .overlay {
   position: absolute;

@@ -4,12 +4,12 @@
     <view class="label-small">头像</view>
     <view class="label-tip">tip: 点击头像进行更换<text wx:if="{{!user.userInfo.avatarUrl}}">（当前是默认头像）</text></view>
     
-    <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+    <view class="avatar-wrapper" bindtap="onChooseAvatar">
       <view class="overlay">
         <image class="overlay-icon" src='/pages/public/images/info/choose.png'></image>
       </view>
       <image class="avatar" src="{{tempAvatarUrl || user.userInfo.avatarUrl || defaultAvatarUrl}}{{avatarTimestamp ? '?t=' + avatarTimestamp : ''}}" mode="aspectFill"></image>
-    </button>
+    </view>
     <view class="label-small">昵称</view>
     <view class="label-tip">请输入昵称</view>
     <view class="name-container">

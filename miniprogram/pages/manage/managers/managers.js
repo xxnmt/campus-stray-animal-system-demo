@@ -24,7 +24,8 @@ Page({
    */
   onLoad: async function (options) {
     // 监听用户信息更新事件
-    app.globalData.eventBus.$on('userInfoUpdated', this.onUserInfoUpdated.bind(this));
+    this.boundOnUserInfoUpdated = this.onUserInfoUpdated.bind(this);
+    app.globalData.eventBus.$on('userInfoUpdated', this.boundOnUserInfoUpdated);
     
     if (await checkAuth(this, 99)) {
       await this.loadUsers(true);
@@ -66,7 +67,8 @@ Page({
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
+    // 移除用户信息更新事件监听
+    app.globalData.eventBus.$off('userInfoUpdated', this.boundOnUserInfoUpdated);
   },
 
   /**

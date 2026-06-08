@@ -29,16 +29,29 @@ Component({
   },
 
   methods: {
-    onChooseAvatar(e) {
-      // 兼容不同的返回格式
-      let avatarUrl = e.detail && e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : e.detail;
-      
-      if (avatarUrl) {
-        this.setData({
-          tempAvatarUrl: avatarUrl,
-          "user.userInfo.avatarUrl": avatarUrl,
-          avatarTimestamp: Date.now() // 更新时间戳防缓存
+    async onChooseAvatar() {
+      // 使用 wx.chooseMedia 替代 chooseAvatar，避免缓存问题
+      try {
+        const res = await wx.chooseMedia({
+          count: 1,
+          mediaType: ['image'],
+          sourceType: ['album', 'camera'],
+          sizeType: ['compressed']
         });
+        
+        if (res.tempFiles && res.tempFiles.length > 0) {
+          const avatarUrl = res.tempFiles[0].tempFilePath;
+          console.log('选择的头像路径:', avatarUrl);
+          
+          this.setData({
+            tempAvatarUrl: avatarUrl,
+            "user.userInfo.avatarUrl": avatarUrl,
+            avatarTimestamp: Date.now() // 更新时间戳防缓存
+          });
+        }
+      } catch (err) {
+        console.error('选择头像失败:', err);
+        // 用户取消选择，不做处理
       }
     },
 
@@ -89,9 +102,27 @@ Component({
 
       // 允许只更新昵称，不强制要求有头像（但如果有头像会更新）
       if (user.userInfo.avatarUrl) {
-        var fileInfo = await this.uploadAvatar(user.userInfo.avatarUrl);
-        user.userInfo.avatarUrl = fileInfo.fileUrl;
-        user.userInfo.avatarUrlId = fileInfo.fileId;
+        try {
+          var fileInfo = await this.uploadAvatar(user.userInfo.avatarUrl);
+          console.log('上传成功，fileInfo:', fileInfo);
+          
+          if (fileInfo && fileInfo.fileUrl) {
+            user.userInfo.avatarUrl = fileInfo.fileUrl;
+            user.userInfo.avatarUrlId = fileInfo.fileId;
+            console.log('头像URL已更新:', user.userInfo.avatarUrl);
+          } else {
+            console.error('上传结果无效，fileUrl为空');
+            throw new Error('上传失败');
+          }
+        } catch (err) {
+          console.error('头像上传失败:', err);
+          wx.hideLoading();
+          wx.showToast({
+            title: '头像上传失败',
+            icon: 'error'
+          });
+          return false;
+        }
       }
 
       console.log('准备更新的用户信息:', user);
@@ -139,22 +170,39 @@ Component({
 
     async uploadAvatar(tempFilePath) {
       const openid = this.data.user.openid;
+      console.log('uploadAvatar called with tempFilePath:', tempFilePath);
+      
       if (!tempFilePath.includes("://tmp")) {
+        console.log('不是临时路径，直接返回现有头像');
         return { fileId: this.data.user.userInfo.avatarUrlId, fileUrl: tempFilePath };
       }
 
       //获取后缀
       const index = tempFilePath.lastIndexOf(".");
       const ext = tempFilePath.substr(index + 1);
+      const cloudPath = `/user/avatar/${openid}.${ext}`;
+      console.log('准备上传，cloudPath:', cloudPath);
+      
       // 上传图片
-      let upRes = await uploadFile({
-        filePath: tempFilePath, // 小程序临时文件路径
-        cloudPath: `/user/avatar/${openid}.${ext}`, // 上传至云端的路径
-      })
+      let upRes;
+      try {
+        upRes = await uploadFile({
+          filePath: tempFilePath, // 小程序临时文件路径
+          cloudPath: cloudPath, // 上传至云端的路径
+        });
+        console.log('上传结果 upRes:', upRes);
+      } catch (err) {
+        console.error('上传失败:', err);
+        throw err;
+      }
 
-      console.log('upRes', upRes);
+      // 检查上传结果
+      if (!upRes || !upRes.fileUrl) {
+        console.error('上传结果无效，fileUrl为空:', upRes);
+        throw new Error('上传失败，未获取到文件URL');
+      }
 
-      return { fileId: upRes.fileId, fileUrl: upRes.fileUrl };
+      return { fileId: upRes.fileId || '', fileUrl: upRes.fileUrl };
     },
 
     async checkNickName(name) {

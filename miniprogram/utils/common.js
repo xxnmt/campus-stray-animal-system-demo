@@ -24,11 +24,20 @@ async function uploadFile(options) {
   const fileName = options.cloudPath;
   const filePath = options.filePath;
 
+  console.log('uploadFile called:', { fileName, filePath });
+
   if (!use_private_tencent_cos) {
-    return await app.mpServerless.file.uploadFile({
-      filePath: filePath, // 小程序临时文件路径
-      cloudPath: fileName, // 上传至云端的路径
-    })
+    try {
+      const result = await app.mpServerless.file.uploadFile({
+        filePath: filePath, // 小程序临时文件路径
+        cloudPath: fileName, // 上传至云端的路径
+      });
+      console.log('EMAS upload result:', result);
+      return result;
+    } catch (err) {
+      console.error('EMAS upload failed:', err);
+      throw err;
+    }
   }
 
   const data = (await api.getURL({
