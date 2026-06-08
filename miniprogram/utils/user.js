@@ -41,8 +41,12 @@ async function getUser(options) {
   }));
   if (userRes && userRes.userInfo) {
     // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+    // 使用更强大的正则表达式匹配各种引号和空白字符
     if (userRes.userInfo.avatarUrl) {
-      userRes.userInfo.avatarUrl = userRes.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+      userRes.userInfo.avatarUrl = userRes.userInfo.avatarUrl
+        .trim()
+        .replace(/[`'"“”‘’´`]/g, '')  // 匹配各种引号字符
+        .replace(/\s+/g, '');         // 移除所有空白字符
     }
     userRes.userInfo.avatarUrl = await signCosUrl(userRes.userInfo.avatarUrl);
   }
@@ -110,8 +114,12 @@ async function getUserInfoMulti(openids, cacheOptions, retMap) {
     var { result: db_res } = await app.mpServerless.db.collection('user').find({ openid: { $in: not_found } });
     for (var user of db_res) {
       // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+      // 使用更强大的正则表达式匹配各种引号和空白字符
       if (user.userInfo && user.userInfo.avatarUrl) {
-        user.userInfo.avatarUrl = user.userInfo.avatarUrl.trim().replace(/[`"]/g, '');
+        user.userInfo.avatarUrl = user.userInfo.avatarUrl
+          .trim()
+          .replace(/[`'"“”‘’´`]/g, '')  // 匹配各种引号字符
+          .replace(/\s+/g, '');         // 移除所有空白字符
       }
       const cacheKey = `uinfo-${user.openid}`;
       setCacheItem(cacheKey, user, 0, randomInt(25, 35));

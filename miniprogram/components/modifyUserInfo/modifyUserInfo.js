@@ -241,11 +241,18 @@ Component({
       let fileUrl = upRes.fileUrl || upRes.url || tempFilePath;
       
       // 关键修复：清理 URL 中的反引号、空格和其他多余字符
+      // 使用更强大的正则表达式匹配各种引号和空白字符
       if (fileUrl) {
-        fileUrl = fileUrl.trim().replace(/[`"]/g, '');
+        fileUrl = fileUrl
+          .trim()
+          .replace(/[`'"“”‘’´`]/g, '')  // 匹配各种引号字符
+          .replace(/\s+/g, '');         // 移除所有空白字符
       }
       if (fileId) {
-        fileId = fileId.trim().replace(/[`"]/g, '');
+        fileId = fileId
+          .trim()
+          .replace(/[`'"“”‘’´`]/g, '')
+          .replace(/\s+/g, '');
       }
       
       console.log('处理后的 fileId:', fileId);
